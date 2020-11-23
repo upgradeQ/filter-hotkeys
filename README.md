@@ -14,7 +14,9 @@ Download scripts, add via Tools > Scripts > + button (path to script)
 # Usage
 Select source with filters, add Filter hotkey filter to it.
 
-In settings bind hotkeys for each filter.Note: 0 - means disable filter , 1 - enable
+In settings bind hotkeys for each filter.
+
+Note: 0 - means disable filter , 1 - enable , 2 - toggle
 
 # Current limitations
 Hotkeys deregistered only after restart
