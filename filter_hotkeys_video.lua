@@ -6,11 +6,11 @@ local obs = obslua
 local bit = require("bit")
 
 local info = {} -- obs_source_info https://obsproject.com/docs/reference-sources.html
-info.id = "_filter_hotkeys"
+info.id = "_filter_hotkeys_video"
 info.type = obs.OBS_SOURCE_TYPE_FILTER
 info.output_flags = bit.bor(obs.OBS_SOURCE_VIDEO)
 
-info.get_name = function() return 'Filter hotkeys' end
+info.get_name = function() return 'Filter hotkeys video' end
 
 info.create = function(settings,source) 
   local filter = {}
@@ -31,7 +31,7 @@ info.reg_htk = function(filter,settings) -- register hotkeys after 100 ms since 
 
   for k,v in pairs(result) do
     _id = obs.obs_source_get_id(v)
-    if _id ~= "_filter_hotkeys" then
+    if _id ~= "_filter_hotkeys_video" then
       filter_name = obs.obs_source_get_name(v)
 
       filter.hotkeys["1;" .. source_name .. ";" .. filter_name] = function()
