@@ -5,6 +5,12 @@
 local obs = obslua
 local bit = require("bit")
 
+function script_description()
+  return [[Select source with filters, add "Filter hotkeys video/audio" to it. <br>
+In settings bind hotkeys for each filter. <br> 
+Note: 0 - means disable filter , 1 - enable , 2 - toggle, 3 - hold ]]
+end
+
 local info = {} -- obs_source_info https://obsproject.com/docs/reference-sources.html
 info.id = "_filter_hotkeys_video"
 info.type = obs.OBS_SOURCE_TYPE_FILTER
@@ -47,6 +53,14 @@ info.reg_htk = function(filter,settings) -- register hotkeys after 100 ms since 
         obs.obs_source_set_enabled(v,switch)
       end
 
+      filter.hotkeys["3;" .. source_name .. ";" .. filter_name] = function(pressed)
+        if pressed then
+          obs.obs_source_set_enabled(v,true)
+        else
+          obs.obs_source_set_enabled(v,false)
+        end
+      end
+
     end
   end
   obs.source_list_release(result)
@@ -57,8 +71,17 @@ info.reg_htk = function(filter,settings) -- register hotkeys after 100 ms since 
   end
 
   for k, v in pairs(filter.hotkeys) do 
-    filter.hk[k] = obs.obs_hotkey_register_frontend(k, k, function(pressed)
-    if pressed then filter.hotkeys[k]() end end)
+    if k:sub(1,1) == "3" then -- for hold hotkeys which start with 3 symbol 
+      filter.hk[k] = obs.obs_hotkey_register_frontend(k, k, function(pressed)
+        if pressed then filter.hotkeys[k](true)
+        else
+          filter.hotkeys[k](false)
+        end
+      end)
+    else
+      filter.hk[k] = obs.obs_hotkey_register_frontend(k, k, function(pressed)
+      if pressed then filter.hotkeys[k]() end end)
+    end
     local a = obs.obs_data_get_array(settings, k)
     obs.obs_hotkey_load(filter.hk[k], a)
     obs.obs_data_array_release(a)

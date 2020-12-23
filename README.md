@@ -16,7 +16,7 @@ Select source with filters, add Filter hotkey filter to it.
 
 In settings bind hotkeys for each filter.
 
-Note: 0 - means disable filter , 1 - enable , 2 - toggle
+Note: 0 - means disable filter , 1 - enable , 2 - toggle , 3 - hold
 
 # Current limitations
 Hotkeys deregistered only after restart
