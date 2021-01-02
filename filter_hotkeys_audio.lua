@@ -61,7 +61,10 @@ info.reg_htk = function(filter,settings) -- register hotkeys after 100 ms since 
         end
       end
 
+    else
+      obs.obs_source_set_enabled(v,false)
     end
+    
   end
   obs.source_list_release(result)
 
