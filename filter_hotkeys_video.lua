@@ -16,25 +16,26 @@ info.id = "_filter_hotkeys_video"
 info.type = obs.OBS_SOURCE_TYPE_FILTER
 info.output_flags = bit.bor(obs.OBS_SOURCE_VIDEO)
 
-info.get_name = function() return 'Filter hotkeys video' end
+info.get_name = function() return 'Filter hotkeys video by upgradeQ' end
 
 info.create = function(settings,source) 
   local filter = {}
   filter.context = source
-  filter._reg_htk = function()
-    info.reg_htk(filter,settings)
-  end
-  obs.timer_add(filter._reg_htk,100) -- callback to register hotkeys , one time only
-
+  filter.created_hotkeys = false
   return filter
 end
 
 info.reg_htk = function(filter,settings) -- register hotkeys after 100 ms since filter was created
-  local target = obs.obs_filter_get_parent(filter.context)
-  local result = obs.obs_source_enum_filters(target)
-  local source_name = obs.obs_source_get_name(target)
+  local parent = obs.obs_filter_get_parent(filter.context)
+  local source_name = obs.obs_source_get_name(parent)
+  filter.target = parent
   filter.hotkeys = {}
+  local proceed = false
+  if parent and source_name then proceed = true end
+  if not proceed then return elseif filter.created_hotkeys then return end
 
+
+  local result = obs.obs_source_enum_filters(filter.target)
   for k,v in pairs(result) do
     _id = obs.obs_source_get_id(v)
     if _id ~= "_filter_hotkeys_video" then
@@ -61,7 +62,10 @@ info.reg_htk = function(filter,settings) -- register hotkeys after 100 ms since 
         end
       end
 
+    else
+      obs.obs_source_set_enabled(v,false)
     end
+
   end
   obs.source_list_release(result)
 
@@ -80,40 +84,35 @@ info.reg_htk = function(filter,settings) -- register hotkeys after 100 ms since 
       end)
     else
       filter.hk[k] = obs.obs_hotkey_register_frontend(k, k, function(pressed)
-      if pressed then filter.hotkeys[k]() end end)
+        if pressed then 
+          filter.hotkeys[k]() 
+        end 
+      end)
     end
     local a = obs.obs_data_get_array(settings, k)
     obs.obs_hotkey_load(filter.hk[k], a)
     obs.obs_data_array_release(a)
   end
+  if not filter.created_hotkeys then
+    filter.created_hotkeys = true
+  end
+end
 
-  obs.remove_current_callback()
+info.video_render = function(filter,seconds)
+  info.reg_htk(filter,nil)
+end
+
+info.load = function(filter,settings)
+  info.reg_htk(filter,settings)
 end
 
 info.save = function(filter,settings)
+  if filter.created_hotkeys then filter.created_hotkeys = true end
   for k, v in pairs(filter.hotkeys) do
     local a = obs.obs_hotkey_save(filter.hk[k])
     obs.obs_data_set_array(settings, k, a)
     obs.obs_data_array_release(a)
   end
-end
-
-info.video_render = function(filter, effect) 
-  -- called every frame
-  local target = obs.obs_filter_get_parent(filter.context)
-  if target ~= nil then
-    filter.width = obs.obs_source_get_base_width(target)
-    filter.height = obs.obs_source_get_base_height(target)
-  end
-  obs.obs_source_skip_video_filter(filter.context) 
-end
-
-info.get_width = function(filter)
-  return filter.width
-end
-
-info.get_height = function(filter)
-  return filter.height
 end
 
 obs.obs_register_source(info)

@@ -25,5 +25,7 @@ Before adding hotkey filter, make sure add filters
 
 Delete hotkey filter from source before unloading it from scripts menu
 
+# See also 
+[`obs-libre-macros`](https://github.com/upgradeQ/obs-libre-macros) - Scripting and macros hotkeys in OBS Studio for Humans 
 # Contribute
 All contributions are welcome!
