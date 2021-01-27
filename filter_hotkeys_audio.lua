@@ -22,14 +22,15 @@ info.create = function(settings,source)
   local filter = {}
   filter.context = source
   filter.created_hotkeys = false
+  filter.hk = {}
+  filter.hotkeys = {}
   return filter
 end
 
-info.reg_htk = function(filter,settings) -- register hotkeys after 100 ms since filter was created
+info.reg_htk = function(filter,settings)  -- registered in video_tick
   local parent = obs.obs_filter_get_parent(filter.context)
   local source_name = obs.obs_source_get_name(parent)
   filter.target = parent
-  filter.hotkeys = {}
   local proceed = false
   if parent and source_name then proceed = true end
   if not proceed then return elseif filter.created_hotkeys then return end
@@ -69,7 +70,6 @@ info.reg_htk = function(filter,settings) -- register hotkeys after 100 ms since 
   end
   obs.source_list_release(result)
 
-  filter.hk = {}
   for k,v in pairs(filter.hotkeys) do 
     filter.hk[k] = obs.OBS_INVALID_HOTKEY_ID
   end
@@ -98,7 +98,7 @@ info.reg_htk = function(filter,settings) -- register hotkeys after 100 ms since 
   end
 end
 
-info.video_render = function(filter,seconds)
+info.video_tick = function(filter,seconds)
   info.reg_htk(filter,nil)
 end
 
