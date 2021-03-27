@@ -22,6 +22,7 @@ info.create = function(settings,source)
   local filter = {}
   filter.context = source
   filter.created_hotkeys = false
+  filter.loaded_settings = settings
   filter.hk = {}
   filter.hotkeys = {}
   return filter
@@ -99,11 +100,7 @@ info.reg_htk = function(filter,settings)  -- registered in video_tick
 end
 
 info.video_tick = function(filter,seconds)
-  info.reg_htk(filter,nil)
-end
-
-info.load = function(filter,settings)
-  info.reg_htk(filter,settings)
+  info.reg_htk(filter,filter.loaded_settings)
 end
 
 info.save = function(filter,settings)
